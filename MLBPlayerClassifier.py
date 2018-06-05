@@ -5,9 +5,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
+import graphviz
 
+os.chdir('D:\\')
 #Import data
 dataset=pd.read_csv('MLB2016PlayerStats.txt')
+
+os.chdir('C:\\Users\\Sabal\\Anaconda3\\Lib\\site-packages\\graphviz')
 
 #Split "Pos Summary" column to obtain Original Position
 dataset[['OriginalPosition',
@@ -79,6 +84,11 @@ classifier.add(Dense(units=11, kernel_initializer ='uniform', activation ='relu'
 #Output Layer
 classifier.add(Dense(units=7, kernel_initializer ='uniform', activation ='softmax'))
 
+#visualizing ann with ann visualizer
+from ann_visualizer.visualize import ann_viz
+
+ann_viz(classifier, view=True,filename='MLBClassifier.gv',title='MLB ANN Classifier')
+
 #Compile ANN
 classifier.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -146,42 +156,11 @@ def build_classifier(optimizer):
 #Assign KerasClassifier    
 classifier=KerasClassifier(build_fn=build_classifier)
 
-   
-Let's Classify Baseball Players Using Deep Learning! Final Part
-JAN
-18
-Let's Classify Baseball Players Using Deep Learning! Final Part
-Welcome to the final installment of our MLB baseball classifier! Thank you for coming along on the creation ride for the ANN. Now we will see if we can find the best parameters using Grid Search.
-If you need to recap/ catch up, you can find all four of the original parts below:
-Understanding the Data and Importing into Python
-
-Prepping Data for ANN
-
-Building and Testing ANN
-
-Assessing our ANN with K-Fold Cross Validation
-
-In the last chapter of this series we will:
-
-Explaining what Grid Search is.
-The Parameters we will improve upon.
-Setup the Grid Search Code
-Review the results and the new accuracy
-What is Grid Search?
-Grid Search is an algorithm used to determine the best parameter choices for a machine learning model. Doing this will allow you to find the best parameters to improve the model's performance. This includes the model's accuracy, precision, the number of epochs, and other metrics that assess the model's efficiency and value. Grid Search is done after K-Fold Cross-Validation since we need to assess the performance of our model first before you search for the optimal set of parameter settings.
-
-The Parameters to Improve
 #Selecting parameters to improve and the options
 parameters={'batch_size': [25,32],
             'epochs':[100,500],
             'optimizer':['adam','rmsprop']}
-In our case, I will model the metrics improved from the Deep Learning Course I took. The parameters are created as a dictionary where the key is the parameter and the output is the list of options of the respective parameter.
 
-First is batch size. Remember that we want to keep the batch size small but not too small. We will provide the batch sizes of 25 and 32 to test. For the number of epochs, we will assess if 100 epochs or 500 epochs to see if more training runs will improve the ANN's performance. 
-
-Lastly, we will see if our original optimizer is still the best, or should we switch to the Adam optimizer function. Adam stands for Adaptive Moment Estimation. According to this post by Sebastian Ruder, Adam does the same actions as Rmsprop, but also keeps track of the "exponentially decaying averages of past gradients". You should also check out Sebastian's blog post to get an overview of other Optimization Algorithms. Perhaps there are others you would like to try if they are appropriate for this model.
-
-Setup the Grid Search Code
 #Import Grid Search and build function for our ANN
 from sklearn.model_selection import GridSearchCV
 def build_classifier(optimizer):
@@ -195,7 +174,6 @@ def build_classifier(optimizer):
     
 #Assign KerasClassifier    
 classifier=KerasClassifier(build_fn=build_classifier)
-First, we will need to import the GridSearchCV class from scikit-learn. Since we are utilizing a class from scikit-learn learn and our model is made with Keras, we will need to encase our model into a function to apply into the KerasClassifier (import this from Keras if you didn't do so yet). It is the same function as we did for the K-Fold Cross-Validation except we will have an optimizer parameter. This allows us to change the optimizer function for our model while we do the Grid Search. Finally, we will assign our KerasClassifier with our function to the classifier variable.
 
 #Setting up Grid Search
 grid_search=GridSearchCV(estimator=classifier,
